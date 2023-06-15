@@ -15,5 +15,10 @@
   "bugs": {
     "url": "https://github.com/johnazedo/bomberman/issues"
   },
-  "homepage": "https://github.com/johnazedo/bomberman#readme"
+  "homepage": "https://github.com/johnazedo/bomberman#readme",
+  "dependencies": {
+    "express": "^4.18.2",
+    "socket.io": "^4.6.1",
+    "uuid": "^9.0.0"
+  }
 }
