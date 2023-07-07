@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      #game-board {
+        position: relative;
+        width: 480px;
+        height: 480px;
+        margin: 0 auto;
+        border: 1px solid #000;
+      }
+
+      .cell {
+        width: 40px;
+        height: 40px;
+        float: left;
+        border: 1px solid #ccc;
+        box-sizing: border-box;
+        background-color: #f5f5f5;
+      }
+
+      .player {
+        background-color: #ff0000;
+      }
+
+      .bomb {
+        background-color: #0000ff;
+      }
+
+      .explosion {
+        background-color: #ff9900;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="game-board"></div>
+
+    <script>
+      // Game constants
+      const BOARD_SIZE = 12;
+      const CELL_SIZE = 40;
+    // 4/6 -> 1000/
+      // Game state
+      let board = [];
+      let playerPosition = { x: 0, y: 0 };
+
+      // Initialize the game board
+      function initializeBoard() {
+        const gameBoard = document.getElementById("game-board");
+
+        for (let row = 0; row < BOARD_SIZE; row++) {
+          board[row] = [];
+          for (let col = 0; col < BOARD_SIZE; col++) {
+            const cell = document.createElement("div");
+            cell.className = "cell";
+            cell.id = `cell-${row}-${col}`;
+            gameBoard.appendChild(cell);
+
+            board[row][col] = {
+              element: cell,
+              type: "empty",
+            };
+          }
+        }
+
+        placePlayer();
+        placeBomb();
+      }
+
+      // Place the player at a random position on the board
+      function placePlayer() {
+        const { x, y } = getRandomPosition();
+        const cell = getCell(x, y);
+        cell.element.classList.add("player");
+        playerPosition = { x, y };
+      }
+
+      // Place a bomb at a random position on the board
+      function placeBomb() {
+        const { x, y } = getRandomPosition();
+        const cell = getCell(x, y);
+        cell.element.classList.add("bomb");
+
+        // Explode the bomb after 2 seconds
+        setTimeout(() => {
+          explodeBomb(x, y);
+        }, 2000);
+      }
+
+      // Explode the bomb at the given position
+      function explodeBomb(x, y) {
+        const cell = getCell(x, y);
+        cell.element.classList.remove("bomb");
+        cell.element.classList.add("explosion");
+
+        // Clear the explosion after 1 second
+        setTimeout(() => {
+          cell.element.classList.remove("explosion");
+        }, 1000);
+
+        // Check adjacent cells for player or other bombs
+        const directions = [
+          { dx: 0, dy: 1 }, // right
+          { dx: 0, dy: -1 }, // left
+          { dx: 1, dy: 0 }, // down
+          { dx: -1, dy: 0 }, // up
+        ];
+
+        for (const direction of directions) {
+          const { dx, dy } = direction;
+          let currX = x + dx;
+          let currY = y + dy;
+
+          while (isValidCell(currX, currY)) {
+            const currCell = getCell(currX, currY);
+
+            if (currCell.element.classList.contains("player")) {
+              console.log("Player hit by explosion!");
+              // Handle player hit logic here
+            } else if (currCell.element.classList.contains("bomb")) {
+              console.log("Bomb hit by explosion!");
+              // Handle bomb hit logic here
+              explodeBomb(currX, currY);
+            } else {
+              // Empty cell, mark it as explosion
+              currCell.element.classList.add("explosion");
+            }
+
+            currX += dx;
+            currY += dy;
+          }
+        }
+      }
+
+      // Check if the given cell coordinates are valid
+      function isValidCell(x, y) {
+        return x >= 0 && x < BOARD_SIZE && y >= 0 && y < BOARD_SIZE;
+      }
+
+      // Get a random position on the board
+      function getRandomPosition() {
+        const x = Math.floor(Math.random() * BOARD_SIZE);
+        const y = Math.floor(Math.random() * BOARD_SIZE);
+        return { x, y };
+      }
+
+      // Get the cell object at a specific position
+      function getCell(x, y) {
+        return board[x][y];
+      }
+
+      // Move the player in the specified direction
+      function movePlayer(direction) {
+        const { x, y } = playerPosition;
+        let nextX = x;
+        let nextY = y;
+
+        if (direction === "up" && x > 0) {
+          nextX--;
+        } else if (direction === "down" && x < BOARD_SIZE - 1) {
+          nextX++;
+        } else if (direction === "left" && y > 0) {
+          nextY--;
+        } else if (direction === "right" && y < BOARD_SIZE - 1) {
+          nextY++;
+        }
+
+        const currentCell = getCell(x, y);
+        const nextCell = getCell(nextX, nextY);
+
+        if (nextCell.type === "empty") {
+          currentCell.element.classList.remove("player");
+          nextCell.element.classList.add("player");
+          playerPosition = { x: nextX, y: nextY };
+        }
+      }
+
+      // Handle keydown events
+      document.addEventListener("keydown", (event) => {
+        const key = event.key;
+
+        if (key === "ArrowUp") {
+          movePlayer("up");
+        } else if (key === "ArrowDown") {
+          movePlayer("down");
+        } else if (key === "ArrowLeft") {
+          movePlayer("left");
+        } else if (key === "ArrowRight") {
+          movePlayer("right");
+        }
+      });
+
+      // Initialize the game
+      initializeBoard();
+    </script>
+  </body>
+</html>
