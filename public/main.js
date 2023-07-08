@@ -1,6 +1,6 @@
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
-const socket = io("ws://172.31.35.99:3000");
+const socket = io("ws://172.31.46.82:3000");
 
 const BOARD_SIZE = 9;
 const BLOCK_SIZE = 64;
@@ -15,8 +15,7 @@ const Blocks = {
     BOMB: 5,
     FRUTE: 6,
     FIRE: 7,
-    PLAYER_WITH_BOMB: 8,
-    OPPONENT_WITH_BOMB: 9,
+    FRUTE_2: 8,
 }
 
 const Identifiers = {
@@ -85,4 +84,8 @@ socket.on(EVENTS.ON_GAME_START, (data) => {
 
 socket.on(EVENTS.WAITING_SECOND_PLAYER, () => {
     warnings.textContent = "Esperando segundo jogador"
+})
+
+socket.on("FINAL_MESSAGE", (data) => {
+    warnings.textContent = data
 })

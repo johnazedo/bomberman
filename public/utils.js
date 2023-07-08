@@ -18,5 +18,6 @@ async function loadImages(blocks) {
     images[blocks.FIRE] = await loadImage('./assets/Flame_F04.png')
     images[blocks.FRUTE] = await loadImage('./assets/BombPowerup.png')
     images[blocks.OPPONENT] = await loadImage('./assets/Creep_F_f01.png')
+    images[blocks.FRUTE_2] = await loadImage('./assets/FlamePowerup.png')
     return images
 }
