@@ -18,16 +18,49 @@
             text-align: center;
         }
     </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-    <canvas id="gameCanvas" width="576" height="576"></canvas>
-    <div id="warnings"></div>
+    <div id="login-container" style="display: block;">
+        <div class="form">
+            <h3 class="title">Email</h3>
+            <input class="emailInput" type="text" placeholder="Digite aqui..." maxlength="40" />
+            <!-- <h3 class="title">Senha</h3> -->
+            <input class="senhaInput" type="hidden" placeholder="Digite aqui..." maxlength="40" />
+            <h3 class="title">Username</h3>
+            <input class="usernameInput" type="text" placeholder="Digite aqui..." maxlength="40" />
+            <br/>
+            <button id="signin" style="margin-top: 24px;">Fazer login</button>
+            <p style="color: red;" id="login-warnings"></p>
+        </div>
+    </div>
+    <div id="lobby-container" style="display: none;">
+        <div class="chat-container">
+            <div class="chat-messages" id="messages"></div>
+            <div class="chat-input">
+                <input id="chat-input-field" type="text" placeholder="Digite sua mensagem">
+                <button id="send-message">Enviar</button>
+            </div>
+        </div>
+
+        <div class="game-list-container">
+            <h1>Todos os jogos</h1>
+            <ul class="game-list" id="games"></ul>
+            <button id="create-game">Criar jogo</button>
+        </div>
+    </div>
+    <div id="game-container" style="display: none;">
+        <canvas id="gameCanvas" width="576" height="576"></canvas>
+        <div id="warnings"></div>
+    </div>
+    <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
     <script src="https://cdn.socket.io/4.6.0/socket.io.min.js"
         integrity="sha384-c79GN5VsunZvi+Q/WObgk2in0CbZsHnjEqvFxC5DxHn9lTfNce2WW6h2pH6u/kF+"
         crossorigin="anonymous"></script>
     <script src="./utils.js"></script>
-    <script src="./main.js"></script>
+    <script src="./login.js"></script>
+    <script src="./game.js"></script>
 </body>
 
 </html>

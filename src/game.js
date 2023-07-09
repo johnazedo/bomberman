@@ -19,15 +19,15 @@ const OBJECTS = {
     PLAYER: 3,
     OPPONENT: 4,
     BOMB: 5,
-    FRUTE: 6,
+    FRUIT: 6,
     FIRE: 7,
-    FRUTE_2: 8,
+    FRUIT_2: 8,
 }
 
 const GAME_STATUS = {
-    CREATED: "CREATED",
-    STARTED: "STARTED",
-    FINISHED: "FINISHED"
+    CREATED: "Criado",
+    STARTED: "Em progresso",
+    FINISHED: "Finalizado"
 }
 
 const PLAYER_STATUS = {
@@ -40,12 +40,15 @@ class Player {
     * @param {Scoket} socket
     */
     constructor(socket) {
-        this.status = PLAYER_STATUS.LIVE 
+        this.status = PLAYER_STATUS.LIVE
         this.socket = socket
         this.id = socket.id
         this.bombPower = 1
         this.numMaxBombs = 1
         this.actualNumBombs = 0;
+        this.username = ""
+        this.email = ""
+        this.password = ""
         this.x = 0;
         this.x = 0;
     }
@@ -108,18 +111,27 @@ class Game {
     * @param {Player} firstPlayer
     * @param {Player} secondPlayer
     */
-    constructor(firstPlayer, secondPlayer) {
+    constructor(firstPlayer) {
         this.id = uuid.v4().toString();
         firstPlayer.setIndex(OBJECTS.PLAYER)
-        secondPlayer.setIndex(OBJECTS.OPPONENT)
         firstPlayer.setPosition(0, 0)
-        secondPlayer.setPosition(8, 8)
         this.players.push(firstPlayer)
+        this.status = GAME_STATUS.CREATED
+        this.config()
+    }
+
+    setSecondPlayer(secondPlayer) {
+        secondPlayer.setIndex(OBJECTS.OPPONENT)
+        secondPlayer.setPosition(8, 8)
         this.players.push(secondPlayer)
     }
 
+    setCallback(callback) {
+        this.callback = callback
+    }
 
     start() {
+        this.leaveConfig()
         this.status = GAME_STATUS.STARTED
         this.players.forEach((player, _) => {
             player.socket.emit(EVENTS.ON_GAME_START, {
@@ -145,24 +157,24 @@ class Game {
     }
 
     checkResult() {
-        if(this.status == GAME_STATUS.FINISHED) {
+        if (this.status === GAME_STATUS.FINISHED) {
             let messageForFirst = "Empate"
             let messageForSecond = "Empate"
-            if(this.players[0].status == PLAYER_STATUS.DEAD && this.players[1].status == PLAYER_STATUS.LIVE){
+            if (this.players[0].status === PLAYER_STATUS.DEAD && this.players[1].status === PLAYER_STATUS.LIVE) {
                 messageForFirst = "Você perdeu"
                 messageForSecond = "Você ganhou"
             }
 
-            if(this.players[0].status == PLAYER_STATUS.LIVE && this.players[1].status == PLAYER_STATUS.DEAD) {
+            if (this.players[0].status === PLAYER_STATUS.LIVE && this.players[1].status === PLAYER_STATUS.DEAD) {
                 messageForFirst = "Você ganhou"
                 messageForSecond = "Você perdeu"
             }
 
             this.players[0].socket.emit(EVENTS.FINAL_MESSAGE, messageForFirst)
             this.players[1].socket.emit(EVENTS.FINAL_MESSAGE, messageForSecond)
+            this.callback()
         }
     }
-
 
 
     /*
@@ -171,16 +183,21 @@ class Game {
     * @param {string} command
     */
     handleWithMoveControls(playerID, command) {
-        if (this.status == GAME_STATUS.STARTED) {
+        if (this.status === GAME_STATUS.STARTED) {
             // Get the player
             let player = this.players[0].isMe(playerID) ? this.players[0] : this.players[1]
             let x = player.x
             let y = player.y
 
-            if (command == EVENTS.TO_UP) { x-- }
-            else if (command == EVENTS.TO_DOWN) { x++ }
-            else if (command == EVENTS.TO_LEFT) { y-- }
-            else if (command == EVENTS.TO_RIGHT) { y++ }
+            if (command === EVENTS.TO_UP) {
+                x--
+            } else if (command === EVENTS.TO_DOWN) {
+                x++
+            } else if (command === EVENTS.TO_LEFT) {
+                y--
+            } else if (command === EVENTS.TO_RIGHT) {
+                y++
+            }
 
             // Check if the player can go to the position
             if (this.isAValidPosition(x, y)) {
@@ -188,12 +205,12 @@ class Game {
                 this.board[x][y] = player.index
                 player.setPosition(x, y);
 
-                if (this.hiddenBoard[x][y] == OBJECTS.FRUTE) {
+                if (this.hiddenBoard[x][y] === OBJECTS.FRUIT) {
                     this.hiddenBoard[x][y] = OBJECTS.NOTHING
                     player.numMaxBombs++;
                 }
 
-                if (this.hiddenBoard[x][y] == OBJECTS.FRUTE_2) {
+                if (this.hiddenBoard[x][y] === OBJECTS.FRUIT_2) {
                     this.hiddenBoard[x][y] = OBJECTS.NOTHING
                     player.bombPower++;
                 }
@@ -207,7 +224,7 @@ class Game {
     * @param {string} playerID
     */
     handleWithBombControl(playerID) {
-        if (this.status == GAME_STATUS.STARTED) {
+        if (this.status === GAME_STATUS.STARTED) {
             let player = this.players[0].isMe(playerID) ? this.players[0] : this.players[1]
             if (player.numMaxBombs > player.actualNumBombs) {
                 let x = player.x
@@ -231,17 +248,25 @@ class Game {
     }
 
     explodBomb(x, y, power, first) {
-        this.board[x][y] = first ? OBJECTS.FIRE : OBJECTS.NOTHING
         this.hiddenBoard[x][y] = OBJECTS.NOTHING
+        this._explodBomb(x, y, first)
         let up = true;
         let down = true;
         let left = true;
         let right = true;
         for (let i = 1; i <= power; i++) {
-            if (up) { up = this._explodBomb(x + i, y, first) }
-            if (down) { down = this._explodBomb(x - i, y, first) }
-            if (right) { right = this._explodBomb(x, y + i, first) }
-            if (left) { left = this._explodBomb(x, y - i, first) }
+            if (up) {
+                up = this._explodBomb(x + i, y, first)
+            }
+            if (down) {
+                down = this._explodBomb(x - i, y, first)
+            }
+            if (right) {
+                right = this._explodBomb(x, y + i, first)
+            }
+            if (left) {
+                left = this._explodBomb(x, y - i, first)
+            }
         }
     }
 
@@ -276,11 +301,31 @@ class Game {
         let xIsValid = x >= 0 && x < 9
         let yIsValid = y >= 0 && y < 9
         if (xIsValid && yIsValid) {
-            let hasNotingOnSpot = this.board[x][y] == OBJECTS.NOTHING
-            return hasNotingOnSpot;
+            return this.board[x][y] === OBJECTS.NOTHING;
         }
         return false
     }
+
+    leaveConfig() {
+        this.players[0].socket.on("disconnect", () => {
+            console.log("Test")
+            this.status = GAME_STATUS.FINISHED
+            this.players[0].status = PLAYER_STATUS.DEAD
+            this.emitState()
+        })
+
+        this.players[1].socket.on("disconnect", () => {
+            this.status = GAME_STATUS.FINISHED
+            this.players[1].status = PLAYER_STATUS.DEAD
+            this.emitState()
+        })
+    }
+
+    config() {
+        this.players[0].socket.on("disconnect", () => {
+            this.status = GAME_STATUS.FINISHED
+        })
+    }
 }
 
-module.exports = { Game, Player, EVENTS }
+module.exports = {Game, Player, EVENTS, GAME_STATUS}

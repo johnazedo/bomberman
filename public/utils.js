@@ -10,14 +10,14 @@ function loadImage(url) {
 
 // Function to load multiple images
 async function loadImages(blocks) {
-    var images = []
+    let images = []
     images[blocks.FIXED_BLOCK] = await loadImage('./assets/ExplodableBlock.png')
     images[blocks.BLOCK] = await loadImage('./assets/SolidBlock.png')
     images[blocks.PLAYER] = await loadImage('./assets/Bman_F_f01.png')
     images[blocks.BOMB] = await loadImage('./assets/Bomb_f01.png')
     images[blocks.FIRE] = await loadImage('./assets/Flame_F04.png')
-    images[blocks.FRUTE] = await loadImage('./assets/BombPowerup.png')
+    images[blocks.FRUIT] = await loadImage('./assets/BombPowerup.png')
     images[blocks.OPPONENT] = await loadImage('./assets/Creep_F_f01.png')
-    images[blocks.FRUTE_2] = await loadImage('./assets/FlamePowerup.png')
+    images[blocks.FRUIT_2] = await loadImage('./assets/FlamePowerup.png')
     return images
 }

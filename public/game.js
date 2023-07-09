@@ -1,6 +1,5 @@
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
-const socket = io("ws://172.31.46.82:3000");
 
 const BOARD_SIZE = 9;
 const BLOCK_SIZE = 64;
@@ -13,14 +12,9 @@ const Blocks = {
     PLAYER: 3,
     OPPONENT: 4,
     BOMB: 5,
-    FRUTE: 6,
+    FRUIT: 6,
     FIRE: 7,
-    FRUTE_2: 8,
-}
-
-const Identifiers = {
-    gameID: '',
-    playerID: ''
+    FRUIT_2: 8,
 }
 
 const EVENTS = {
@@ -37,15 +31,18 @@ let hiddenBoard = []
 
 window.addEventListener(EVENTS.KEY_PRESSED, function(event) {
     const key = event.key;
-    socket.emit(key, Identifiers)
+    socket.emit(key, {
+        gameID: gameID,
+        playerID: playerID
+    })
 })
 
 function draw() {
     ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
     for (let row = 0; row < BOARD_SIZE; row++) {
         for (let column = 0; column < BOARD_SIZE; column++) {
-            var boardIndex = board[row][column]
-            var hiddenBoardIndex = hiddenBoard[row][column]
+            let boardIndex = board[row][column]
+            let hiddenBoardIndex = hiddenBoard[row][column]
           
             if (hiddenBoardIndex != Blocks.NOTHING) {
                 ctx.drawImage(images[hiddenBoardIndex], column * BLOCK_SIZE, row * BLOCK_SIZE)
@@ -75,9 +72,7 @@ socket.on(EVENTS.UPDATE_BOARD, (data) => {
     hiddenBoard = data.hiddenBoard
 });
 
-socket.on(EVENTS.ON_GAME_START, (data) => {
-    Identifiers.gameID = data.gameID
-    Identifiers.playerID = data.playerID
+socket.on(EVENTS.ON_GAME_START, () => {
     warnings.textContent = ""
     run();
 })

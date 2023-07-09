@@ -1,0 +1,123 @@
+body {
+    font-family: Arial, sans-serif;
+}
+
+.chat-container {
+    max-width: 400px;
+    margin: 20px auto;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.chat-header {
+    background-color: #f0f0f0;
+    padding: 10px;
+    text-align: center;
+}
+
+.chat-messages {
+    padding: 10px;
+}
+
+.message {
+    margin-bottom: 10px;
+}
+
+.sender {
+    font-weight: bold;
+}
+
+.content {
+    margin-left: 10px;
+}
+
+.chat-input {
+    display: flex;
+    padding: 10px;
+}
+
+input[type="text"] {
+    flex: 1;
+    padding: 5px;
+    border-radius: 3px;
+    border: 1px solid #ccc;
+}
+
+button {
+    margin-left: 5px;
+    padding: 5px 10px;
+    border-radius: 3px;
+    border: none;
+    background-color: #4caf50;
+    color: #fff;
+    cursor: pointer;
+}
+
+.chat-messages {
+    height: 300px;
+    /* Set the desired height */
+    padding: 10px;
+    overflow: auto;
+    /* Enable scroll when content exceeds container height */
+}
+
+body {
+    font-family: Arial, sans-serif;
+}
+
+.game-list-container {
+    max-width: 400px;
+    margin: 20px auto;
+    height: 300px;
+    /* Set the desired height */
+    overflow: auto;/
+}
+
+h1 {
+    text-align: center;
+}
+
+.game-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+li {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.game-name {
+    flex: 1;
+}
+
+.game-state,
+.game-owner {
+    margin-left: 10px;
+}
+
+.play-button {
+    margin-left: 10px;
+    padding: 5px 10px;
+    border-radius: 3px;
+    border: none;
+    background-color: #4caf50;
+    color: #fff;
+    cursor: pointer;
+}
+
+.game-list-container,
+.chat-container {
+    display: inline-block;
+    width: 100%;
+    /* Adjust the width as needed */
+    vertical-align: top;
+    /* Align divs vertically */
+}
+
+#lobby-container {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
